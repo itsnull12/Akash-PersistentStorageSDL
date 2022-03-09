@@ -1,0 +1,43 @@
+---
+version: "2.0"
+
+services:
+  mysql:
+    image: mysql
+    expose:
+      - port: 3306
+        as: 3306
+        to:
+          - global: true
+    params:
+      storage:
+        data:
+          mount: /var/lib/mysql
+profiles:
+  compute:
+    mysql-profile:
+      resources:
+        cpu:
+          units: 1
+        memory:
+          size: 1Gi
+        storage:
+          - size: 512Mi
+          - name: data
+            size: 1Gi
+            attributes:
+              persistent: true
+              class: beta2
+  placement:
+    westcoast:
+      attributes:
+        region: us-east
+      pricing:
+        mysql-profile:
+          denom: uakt
+          amount: 1000.1
+deployment:
+  mysql:
+    westcoast:
+      profile: mysql-profile
+      count: 1
